@@ -1,4 +1,3 @@
-import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import firebase from "firebase/compat";
 import { getFirestore } from "firebase/firestore";

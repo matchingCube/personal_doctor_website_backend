@@ -32,6 +32,7 @@ import Pricing from "./pages/pages/Pricing";
 import Tasks from "./pages/pages/Tasks";
 import Chat from "./pages/pages/Chat";
 import Blank from "./pages/pages/Blank";
+import Blog from "./pages/pages/Blog";
 
 // Auth
 import Page500 from "./pages/auth/Page500";
@@ -186,6 +187,10 @@ const routes = [
       {
         path: "blank",
         element: <Blank />,
+      },
+      {
+        path: "blog",
+        element: <Blog />,
       },
     ],
   },

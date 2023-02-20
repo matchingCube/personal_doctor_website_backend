@@ -65,6 +65,10 @@ const pagesSection = [
         title: "Projects",
       },
       {
+        href: "/pages/blog",
+        title: "Blog",
+      },
+      {
         href: "/pages/invoice",
         title: "Invoice",
       },
