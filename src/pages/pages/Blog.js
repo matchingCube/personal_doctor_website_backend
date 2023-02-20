@@ -4,12 +4,19 @@ import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { addDoc, collection } from "firebase/firestore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
-import { db } from "../../config";
+import { db, storage } from "../../config";
+import {
+  ref as ref_storage,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 
 import avatar1 from "../../assets/img/avatars/avatar.jpg";
 
 const PublicInfo = () => {
   const [previewImage, setPreviewImage] = useState(undefined);
+  const [imgFile, setImgFile] = useState("");
+  const [uploadPercent, setUploadPercent] = useState(0);
   const inputRef = useRef();
   const titleRef = useRef();
   const contentRef = useRef();
@@ -18,38 +25,64 @@ const PublicInfo = () => {
   };
   const selectFile = (e) => {
     setPreviewImage(URL.createObjectURL(e.target.files[0]));
+    setImgFile(e.target.files[0]);
   };
-  const submithandler = async (e) => {
-    e.preventDefault();
-    console.log("Title: ", titleRef.current.value);
-    console.log("Content: ", contentRef.current.value);
-    console.log("Image URL: ", previewImage);
-    let today = new Date();
-    let date =
-      today.getDate() +
-      "." +
-      (today.getMonth() + 1) +
-      "." +
-      today.getFullYear();
-    console.log("Date: ", date);
-    const ref = collection(db, "blog_data");
+  const submithandler = (e) => {
+    if (!imgFile) {
+      alert("Please choose an image file first!");
+    } else if (!titleRef.current.value) {
+      alert("Please type the title first!");
+    } else if (!contentRef.current.value) {
+      alert("Please type the content first!");
+    } else {
+      e.preventDefault();
+      const storageRef = ref_storage(storage, `/blog_images/${imgFile.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, imgFile);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const percent = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setUploadPercent(percent);
+        },
+        (err) => console.log(err),
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
+            console.log("Title: ", titleRef.current.value);
+            console.log("Content: ", contentRef.current.value);
+            console.log("Image URL: ", url);
+            let today = new Date();
+            let date =
+              today.getMonth() +
+              1 +
+              "." +
+              today.getDate() +
+              "." +
+              today.getFullYear();
+            console.log("Date: ", date);
+            const ref = collection(db, "blog_data");
 
-    let data = {
-      title: titleRef.current.value,
-      content: contentRef.current.value,
-      image: previewImage,
-      date: date,
-    };
+            let data = {
+              title: titleRef.current.value,
+              content: contentRef.current.value,
+              image: url,
+              date: date,
+            };
 
-    try {
-      const docRef = await addDoc(ref, data);
-      console.log("Document written by ID: ", docRef.id);
-    } catch (e) {
-      console.log(e);
+            try {
+              const docRef = await addDoc(ref, data);
+              console.log("Document written by ID: ", docRef.id);
+            } catch (e) {
+              console.log(e);
+            }
+
+            titleRef.current.value = "";
+            contentRef.current.value = "";
+          });
+        }
+      );
     }
-
-    titleRef.current.value = "";
-    contentRef.current.value = "";
   };
 
   return (
@@ -105,6 +138,7 @@ const PublicInfo = () => {
                   </Button>
                 </div>
                 <small>Please upload an image for your blog post.</small>
+                <div>{uploadPercent}% done</div>
               </div>
             </Col>
           </Row>
