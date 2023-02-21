@@ -19,6 +19,7 @@ const PublicInfo = () => {
   const [uploadPercent, setUploadPercent] = useState(0);
   const inputRef = useRef();
   const titleRef = useRef();
+  const subjectRef = useRef();
   const contentRef = useRef();
   const handleUpload = () => {
     inputRef.current?.click();
@@ -50,6 +51,7 @@ const PublicInfo = () => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
             console.log("Title: ", titleRef.current.value);
+            console.log("Subject: ", subjectRef.current.value);
             console.log("Content: ", contentRef.current.value);
             console.log("Image URL: ", url);
             let today = new Date();
@@ -65,6 +67,7 @@ const PublicInfo = () => {
 
             let data = {
               title: titleRef.current.value,
+              subject: subjectRef.current.value,
               content: contentRef.current.value,
               image: url,
               date: date,
@@ -78,6 +81,7 @@ const PublicInfo = () => {
             }
 
             titleRef.current.value = "";
+            subjectRef.current.value = "";
             contentRef.current.value = "";
           });
         }
@@ -106,6 +110,15 @@ const PublicInfo = () => {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
+                <Form.Label htmlFor="inputSubject">Subject</Form.Label>
+                <Form.Control
+                  ref={subjectRef}
+                  type="text"
+                  id="inputSubject"
+                  placeholder="Subject"
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
                 <Form.Label htmlFor="inputContent">Content</Form.Label>
                 <Form.Control
                   ref={contentRef}
@@ -123,7 +136,7 @@ const PublicInfo = () => {
                   src={previewImage ? previewImage : avatar1}
                   className="img-responsive mt-2"
                   width="90%"
-                  height="160"
+                  height="200"
                 />
                 <div className="mt-2">
                   <input
