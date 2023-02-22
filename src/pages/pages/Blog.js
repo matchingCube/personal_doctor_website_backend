@@ -64,6 +64,9 @@ const PublicInfo = () => {
               today.getFullYear();
             console.log("Date: ", date);
             const ref = collection(db, "blog_data");
+            const thumb_count = 0;
+            console.log("Thumb-Up: ", thumb_count);
+            console.log("Thumb-Down: ", thumb_count);
 
             let data = {
               title: titleRef.current.value,
@@ -71,6 +74,8 @@ const PublicInfo = () => {
               content: contentRef.current.value,
               image: url,
               date: date,
+              thumbUp: thumb_count,
+              thumbDown: thumb_count,
             };
 
             try {
